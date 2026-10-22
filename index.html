@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>大学時間割＆出席管理</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B0B0C">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    body {
+      background-color: #0B0B0C;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 40%);
+      color: #F3F4F6;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Kaku Gothic ProN", sans-serif;
+      min-height: 100vh;
+      padding: calc(16px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-container {
+      width: 100%;
+      max-width: 760px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 4px 6px;
+    }
+    .header-title-group h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.03em;
+    }
+    .header-title-group p {
+      font-size: 0.72rem;
+      color: #9CA3AF;
+      margin-top: 2px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 8px 12px;
+      color: #FFF;
+      font-size: 0.82rem;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform 0.12s ease, background-color 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .icon-btn:active {
+      transform: scale(0.94);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .timetable-wrapper {
+      background: rgba(23, 23, 26, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 12px 6px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .timetable {
+      display: grid;
+      grid-template-columns: 48px repeat(6, minmax(88px, 1fr));
+      gap: 6px;
+    }
+    .header-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: #D1D5DB;
+      font-weight: 600;
+      padding-bottom: 6px;
+    }
+    .time-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #71717A;
+      padding: 2px 0;
+    }
+    .time-cell .num {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #A1A1AA;
+    }
+    .time-cell .sub {
+      font-size: 0.55rem;
+      line-height: 1.1;
+      margin-top: 2px;
+      text-align: center;
+    }
+    .slot-cell {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      min-height: 88px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      word-break: break-all;
+    }
+    .slot-cell.filled {
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.38);
+      justify-content: space-between;
+      align-items: stretch;
+    }
+    .slot-cell:active {
+      transform: scale(0.94);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .plus-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #71717A;
+      font-size: 0.95rem;
+    }
+
+    .slot-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.2;
+      margin-bottom: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .slot-room {
+      font-size: 0.62rem;
+      color: #A1A1AA;
+      margin-bottom: 4px;
+    }
+    .slot-badges {
+      display: flex;
+      gap: 2px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 0.58rem;
+      padding: 2px 4px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+    .badge-present { background: rgba(34, 197, 94, 0.2); color: #4ADE80; }
+    .badge-absent { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+    .badge-late { background: rgba(234, 179, 8, 0.2); color: #FACC15; }
+
+    /* モーダル */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 12px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: #18181B;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 26px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 18px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transform: translateY(20px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #FFF;
+    }
+    .header-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .edit-toggle-btn {
+      background: rgba(99, 102, 241, 0.18);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #818CF8;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #A1A1AA;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .view-card-section {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .view-subject-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+    .view-classroom {
+      font-size: 0.82rem;
+      color: #A1A1AA;
+    }
+    .btn-syllabus-large {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #A5B4FC;
+      border-radius: 14px;
+      padding: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      margin-bottom: 14px;
+      transition: background 0.15s ease;
+    }
+    .btn-syllabus-large:active {
+      background: rgba(99, 102, 241, 0.28);
+    }
+    .notes-display {
+      font-size: 0.85rem;
+      color: #D1D5DB;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #9CA3AF;
+      margin-bottom: 6px;
+    }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #FFF;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: #6366F1;
+    }
+
+    .attendance-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .attendance-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+    .attendance-box:active {
+      transform: scale(0.92);
+    }
+    .attendance-box .count {
+      font-size: 0.68rem;
+      color: #71717A;
+    }
+    .attendance-box .status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .attendance-box[data-status="none"] { background: rgba(255, 255, 255, 0.03); color: #52525B; }
+    .attendance-box[data-status="present"] { background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: #4ADE80; }
+    .attendance-box[data-status="absent"] { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #F87171; }
+    .attendance-box[data-status="late"] { background: rgba(234, 179, 8, 0.15); border-color: rgba(234, 179, 8, 0.4); color: #FACC15; }
+
+    .action-btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-save {
+      flex: 2;
+      background: #6366F1;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .btn-delete {
+      flex: 1;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #F87171;
+      border-radius: 14px;
+      padding: 13px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .btn-save:active, .btn-delete:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="header-title-group">
+        <h1>🎓 時間割 & 出席ノート</h1>
+        <p>2026 前期セメスター</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="exportData()" title="バックアップ書き出し">📤 出力</button>
+        <label class="icon-btn" title="データ読み込み">
+          📥 復元<input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none;">
+        </label>
+      </div>
+    </header>
+
+    <main class="timetable-wrapper">
+      <div class="timetable" id="timetable"></div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="modalSlotTitle">授業詳細</span>
+        <div class="header-btns">
+          <button class="edit-toggle-btn" id="editToggleBtn" onclick="toggleEditMode()">✏️ 編集</button>
+          <button class="close-btn" onclick="closeModal()">×</button>
+        </div>
+      </div>
+
+      <div id="viewModeArea">
+        <div class="view-card-section" id="viewCardSection">
+          <div class="view-subject-name" id="viewSubjectName">未設定</div>
+          <div class="view-classroom" id="viewClassroom"></div>
+        </div>
+
+        <a id="viewSyllabusBtn" href="#" target="_blank" class="btn-syllabus-large" style="display:none;">
+          🔗 シラバスを開く
+        </a>
+
+        <div class="form-group">
+          <label class="form-label">15回 出席記録（タップで記録更新）</label>
+          <div class="attendance-grid" id="viewAttendanceGrid"></div>
+        </div>
+
+        <div class="form-group" id="viewNotesGroup">
+          <label class="form-label">メモ・課題</label>
+          <div class="notes-display" id="viewNotes">（メモはありません）</div>
+        </div>
+      </div>
+
+      <div id="editModeArea" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">授業名</label>
+          <input type="text" id="subjectName" class="form-input" placeholder="例: キリスト教概論I">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">教室・担当教員</label>
+          <input type="text" id="classroom" class="form-input" placeholder="例: E205">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">シラバス URL</label>
+          <input type="url" id="syllabusUrl" class="form-input" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">メモ・課題</label>
+          <textarea id="notes" class="form-textarea" rows="3" placeholder="テスト範囲や持ち物など"></textarea>
+        </div>
+
+        <div class="action-btn-group">
+          <button class="btn-delete" onclick="deleteLesson()">削除</button>
+          <button class="btn-save" onclick="saveCurrentLesson()">完了・保存</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const days = ['月', '火', '水', '木', '金', '土'];
+    const periods = [
+      { num: 1, start: '09:00', end: '10:30' },
+      { num: 2, start: '11:00', end: '12:30' },
+      { num: 3, start: '13:20', end: '14:50' },
+      { num: 4, start: '15:05', end: '16:35' },
+      { num: 5, start: '16:50', end: '18:20' },
+      { num: 6, start: '18:35', end: '20:05' }
+    ];
+
+    const statuses = ['none', 'present', 'absent', 'late'];
+    const statusLabels = { 'none': 'ー', 'present': '出席', 'absent': '欠席', 'late': '遅刻' };
+
+    let currentSlotId = null;
+    let timetableData = {};
+    let db = null;
+    let isEditMode = false;
+
+    function initDB() {
+      return new Promise((resolve) => {
+        const request = indexedDB.open('TimetableAppDB', 1);
+        request.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains('lessons')) {
+            database.createObjectStore('lessons', { keyPath: 'id' });
+          }
+        };
+        request.onsuccess = (e) => {
+          db = e.target.result;
+          loadAllData().then(resolve);
+        };
+        request.onerror = (e) => {
+          console.error('IndexedDB Error:', e);
+          resolve();
+        };
+      });
+    }
+
+    function loadAllData() {
+      return new Promise((resolve) => {
+        if (!db) return resolve();
+        const tx = db.transaction('lessons', 'readonly');
+        const store = tx.objectStore('lessons');
+        const request = store.getAll();
+        request.onsuccess = () => {
+          timetableData = {};
+          request.result.forEach(item => {
+            timetableData[item.id] = item;
+          });
+          renderTimetable();
+          resolve();
+        };
+      });
+    }
+
+    function saveLessonToDB(lesson) {
+      if (!db) return;
+      const tx = db.transaction('lessons', 'readwrite');
+      tx.objectStore('lessons').put(lesson);
+    }
+
+    function deleteLessonFromDB(id) {
+      if (!db) return;
+      const tx = db.transaction('lessons', 'readwrite');
+      tx.objectStore('lessons').delete(id);
+    }
+
+    function renderTimetable() {
+      const container = document.getElementById('timetable');
+      container.innerHTML = '';
+      container.appendChild(document.createElement('div'));
+
+      days.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'header-cell';
+        header.textContent = day;
+        container.appendChild(header);
+      });
+
+      periods.forEach(p => {
+        const timeCell = document.createElement('div');
+        timeCell.className = 'time-cell';
+        timeCell.innerHTML = `
+          <span class="num">${p.num}</span>
+          <span class="sub">${p.start}<br>|<br>${p.end}</span>
+        `;
+        container.appendChild(timeCell);
+
+        days.forEach(day => {
+          const slotId = `${day}_${p.num}`;
+          const data = timetableData[slotId];
+          const slot = document.createElement('div');
+
+          if (data && data.name) {
+            slot.className = 'slot-cell filled';
+            
+            const counts = { present: 0, absent: 0, late: 0 };
+            (data.attendance || []).forEach(st => {
+              if (counts[st] !== undefined) counts[st]++;
+            });
+
+            let badgeHtml = '';
+            if (counts.present > 0) badgeHtml += `<span class="badge badge-present">出:${counts.present}</span>`;
+            if (counts.absent > 0) badgeHtml += `<span class="badge badge-absent">欠:${counts.absent}</span>`;
+            if (counts.late > 0) badgeHtml += `<span class="badge badge-late">遅:${counts.late}</span>`;
+
+            slot.innerHTML = `
+              <div>
+                <div class="slot-title">${escapeHtml(data.name)}</div>
+                <div class="slot-room">${escapeHtml(data.classroom || '')}</div>
+              </div>
+              <div class="slot-badges">${badgeHtml}</div>
+            `;
+          } else {
+            slot.className = 'slot-cell';
+            slot.innerHTML = '<div class="plus-btn">＋</div>';
+          }
+
+          slot.onclick = () => openModal(slotId, `${day}曜 ${p.num}限`);
+          container.appendChild(slot);
+        });
+      });
+    }
+
+    function openModal(slotId, titleText) {
+      currentSlotId = slotId;
+      document.getElementById('modalSlotTitle').textContent = titleText;
+      
+      const data = timetableData[slotId] || { name: '', classroom: '', syllabusUrl: '', attendance: Array(15).fill('none'), notes: '' };
+
+      isEditMode = !data.name;
+      updateModalDisplayMode();
+
+      document.getElementById('subjectName').value = data.name || '';
+      document.getElementById('classroom').value = data.classroom || '';
+      document.getElementById('syllabusUrl').value = data.syllabusUrl || '';
+      document.getElementById('notes').value = data.notes || '';
+
+      document.getElementById('viewSubjectName').textContent = data.name || '（未登録）';
+      document.getElementById('viewClassroom').textContent = data.classroom || '教室未設定';
+      document.getElementById('viewNotes').textContent = data.notes || '（メモはありません）';
+
+      const sylBtn = document.getElementById('viewSyllabusBtn');
+      if (data.syllabusUrl && (data.syllabusUrl.startsWith('http://') || data.syllabusUrl.startsWith('https://'))) {
+        sylBtn.href = data.syllabusUrl;
+        sylBtn.style.display = 'flex';
+      } else {
+        sylBtn.style.display = 'none';
+      }
+
+      renderAttendanceGrid(data.attendance || Array(15).fill('none'));
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      updateModalDisplayMode();
+    }
+
+    function updateModalDisplayMode() {
+      const viewArea = document.getElementById('viewModeArea');
+      const editArea = document.getElementById('editModeArea');
+      const toggleBtn = document.getElementById('editToggleBtn');
+
+      if (isEditMode) {
+        viewArea.style.display = 'none';
+        editArea.style.display = 'block';
+        toggleBtn.textContent = '👁 閲覧';
+      } else {
+        viewArea.style.display = 'block';
+        editArea.style.display = 'none';
+        toggleBtn.textContent = '✏️ 編集';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function renderAttendanceGrid(attendanceList) {
+      const grid = document.getElementById('viewAttendanceGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < 15; i++) {
+        const st = attendanceList[i] || 'none';
+        const box = document.createElement('div');
+        box.className = 'attendance-box';
+        box.dataset.status = st;
+        box.innerHTML = `<span class="count">${i + 1}</span><span class="status">${statusLabels[st]}</span>`;
+
+        box.onclick = () => {
+          const current = box.dataset.status;
+          const nextIndex = (statuses.indexOf(current) + 1) % statuses.length;
+          const nextStatus = statuses[nextIndex];
+
+          box.dataset.status = nextStatus;
+          box.querySelector('.status').textContent = statusLabels[nextStatus];
+
+          saveAttendanceQuick();
+        };
+
+        grid.appendChild(box);
+      }
+    }
+
+    function saveAttendanceQuick() {
+      if (!currentSlotId || !timetableData[currentSlotId]) return;
+
+      const attendance = [];
+      document.querySelectorAll('#viewAttendanceGrid .attendance-box').forEach(box => {
+        attendance.push(box.dataset.status);
+      });
+
+      timetableData[currentSlotId].attendance = attendance;
+      saveLessonToDB(timetableData[currentSlotId]);
+      renderTimetable();
+    }
+
+    function saveCurrentLesson() {
+      if (!currentSlotId) return;
+
+      const name = document.getElementById('subjectName').value.trim();
+      const classroom = document.getElementById('classroom').value.trim();
+      const syllabusUrl = document.getElementById('syllabusUrl').value.trim();
+      const notes = document.getElementById('notes').value;
+
+      let attendance = Array(15).fill('none');
+      if (timetableData[currentSlotId] && timetableData[currentSlotId].attendance) {
+        attendance = timetableData[currentSlotId].attendance;
+      }
+
+      if (!name) {
+        deleteLessonFromDB(currentSlotId);
+        delete timetableData[currentSlotId];
+      } else {
+        const lesson = { id: currentSlotId, name, classroom, syllabusUrl, attendance, notes };
+        timetableData[currentSlotId] = lesson;
+        saveLessonToDB(lesson);
+      }
+
+      renderTimetable();
+      closeModal();
+    }
+
+    function deleteLesson() {
+      if (!currentSlotId) return;
+      deleteLessonFromDB(currentSlotId);
+      delete timetableData[currentSlotId];
+      renderTimetable();
+      closeModal();
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(timetableData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `timetable_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (typeof importedData === 'object' && importedData !== null) {
+            if (confirm('現在のデータを上書きして復元します。よろしいですか？')) {
+              const tx = db.transaction('lessons', 'readwrite');
+              const store = tx.objectStore('lessons');
+              store.clear().onsuccess = () => {
+                Object.values(importedData).forEach(item => {
+                  store.put(item);
+                });
+                timetableData = importedData;
+                renderTimetable();
+                alert('データを正常に復元いたしましたわ！');
+              };
+            }
+          }
+        } catch (err) {
+          alert('ファイルの読み込みに失敗いたしましたわ。');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+    }
+
+    // Service Worker 登録
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW Error:', err));
+      });
+    }
+
+    initDB();
+  </script>
+</body>
+</html>
