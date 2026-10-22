@@ -22,7 +22,7 @@
       color: #F3F4F6;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Kaku Gothic ProN", sans-serif;
       min-height: 100vh;
-      padding: calc(16px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+      padding: calc(12px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -30,25 +30,36 @@
     }
     .app-container {
       width: 100%;
-      max-width: 760px;
+      max-width: 600px;
     }
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      padding: 4px 6px;
+      margin-bottom: 12px;
+      padding: 2px 4px;
     }
     .header-title-group h1 {
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: #FFFFFF;
       letter-spacing: -0.03em;
     }
-    .header-title-group p {
-      font-size: 0.72rem;
-      color: #9CA3AF;
-      margin-top: 2px;
+    .semester-select {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #818CF8;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      border-radius: 10px;
+      outline: none;
+      margin-top: 3px;
+      cursor: pointer;
+    }
+    .semester-select option {
+      background: #18181B;
+      color: #FFF;
     }
     .header-actions {
       display: flex;
@@ -58,9 +69,9 @@
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
-      padding: 8px 12px;
+      padding: 7px 10px;
       color: #FFF;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       cursor: pointer;
       backdrop-filter: blur(8px);
       transition: transform 0.12s ease, background-color 0.12s ease;
@@ -74,30 +85,31 @@
       background: rgba(255, 255, 255, 0.12);
     }
 
+    /* 横スクロールなし・完全フィットテーブル */
     .timetable-wrapper {
       background: rgba(23, 23, 26, 0.65);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 12px 6px;
+      border-radius: 18px;
+      padding: 8px 6px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      width: 100%;
     }
     .timetable {
       display: grid;
-      grid-template-columns: 48px repeat(6, minmax(88px, 1fr));
-      gap: 6px;
+      grid-template-columns: 36px repeat(5, 1fr);
+      gap: 5px;
+      width: 100%;
     }
     .header-cell {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #D1D5DB;
       font-weight: 600;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
     }
     .time-cell {
       display: flex;
@@ -108,22 +120,22 @@
       padding: 2px 0;
     }
     .time-cell .num {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #A1A1AA;
     }
     .time-cell .sub {
-      font-size: 0.55rem;
+      font-size: 0.5rem;
       line-height: 1.1;
-      margin-top: 2px;
+      margin-top: 1px;
       text-align: center;
     }
     .slot-cell {
       background: rgba(255, 255, 255, 0.02);
       border: 1px dashed rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      min-height: 88px;
-      padding: 6px;
+      border-radius: 12px;
+      min-height: 76px;
+      padding: 4px 2px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -145,8 +157,8 @@
       background: rgba(255, 255, 255, 0.08);
     }
     .plus-btn {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -154,24 +166,27 @@
       align-items: center;
       justify-content: center;
       color: #71717A;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .slot-title {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 700;
       color: #FFFFFF;
-      line-height: 1.2;
-      margin-bottom: 3px;
+      line-height: 1.15;
+      margin-bottom: 2px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
     .slot-room {
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       color: #A1A1AA;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .slot-badges {
       display: flex;
@@ -180,9 +195,9 @@
       flex-wrap: wrap;
     }
     .badge {
-      font-size: 0.58rem;
-      padding: 2px 4px;
-      border-radius: 5px;
+      font-size: 0.52rem;
+      padding: 1px 3px;
+      border-radius: 4px;
       font-weight: 600;
     }
     .badge-present { background: rgba(34, 197, 94, 0.2); color: #4ADE80; }
@@ -216,13 +231,13 @@
     .modal-card {
       background: #18181B;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 26px;
+      border-radius: 24px;
       width: 100%;
       max-width: 500px;
       max-height: 85vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 20px 18px;
+      padding: 18px 16px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       transform: translateY(20px);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -234,10 +249,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .modal-title {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #FFF;
     }
@@ -273,18 +288,18 @@
     .view-card-section {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .view-subject-name {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: #FFFFFF;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .view-classroom {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: #A1A1AA;
     }
     .btn-syllabus-large {
@@ -296,46 +311,46 @@
       background: rgba(99, 102, 241, 0.15);
       border: 1px solid rgba(99, 102, 241, 0.35);
       color: #A5B4FC;
-      border-radius: 14px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 11px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       text-decoration: none;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       transition: background 0.15s ease;
     }
     .btn-syllabus-large:active {
       background: rgba(99, 102, 241, 0.28);
     }
     .notes-display {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #D1D5DB;
       white-space: pre-wrap;
       line-height: 1.4;
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
       padding: 10px;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .form-group {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .form-label {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #9CA3AF;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .form-input, .form-textarea {
       width: 100%;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
-      padding: 10px 14px;
+      padding: 9px 12px;
       color: #FFF;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       outline: none;
     }
     .form-input:focus, .form-textarea:focus {
@@ -346,13 +361,13 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 5px;
     }
     .attendance-box {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      min-height: 52px;
+      min-height: 48px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -365,11 +380,11 @@
       transform: scale(0.92);
     }
     .attendance-box .count {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: #71717A;
     }
     .attendance-box .status {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       margin-top: 2px;
     }
@@ -382,7 +397,7 @@
     .action-btn-group {
       display: flex;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 14px;
     }
     .btn-save {
       flex: 2;
@@ -390,9 +405,9 @@
       color: white;
       border: none;
       border-radius: 14px;
-      padding: 13px;
+      padding: 12px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: transform 0.12s ease;
     }
@@ -402,9 +417,9 @@
       border: 1px solid rgba(239, 68, 68, 0.3);
       color: #F87171;
       border-radius: 14px;
-      padding: 13px;
+      padding: 12px;
       font-weight: 600;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       cursor: pointer;
     }
     .btn-save:active, .btn-delete:active {
@@ -417,7 +432,16 @@
     <header>
       <div class="header-title-group">
         <h1>🎓 時間割 & 出席ノート</h1>
-        <p>2026 前期セメスター</p>
+        <select id="semesterSelect" class="semester-select" onchange="changeSemester()">
+          <option value="1年前期">1年 前期</option>
+          <option value="1年後期">1年 後期</option>
+          <option value="2年前期">2年 前期</option>
+          <option value="2年後期">2年 後期</option>
+          <option value="3年前期">3年 前期</option>
+          <option value="3年後期">3年 後期</option>
+          <option value="4年前期">4年 前期</option>
+          <option value="4年後期">4年 後期</option>
+        </select>
       </div>
       <div class="header-actions">
         <button class="icon-btn" onclick="exportData()" title="バックアップ書き出し">📤 出力</button>
@@ -494,7 +518,7 @@
   </div>
 
   <script>
-    const days = ['月', '火', '水', '木', '金', '土'];
+    const days = ['月', '火', '水', '木', '金'];
     const periods = [
       { num: 1, start: '09:00', end: '10:30' },
       { num: 2, start: '11:00', end: '12:30' },
@@ -507,6 +531,7 @@
     const statuses = ['none', 'present', 'absent', 'late'];
     const statusLabels = { 'none': 'ー', 'present': '出席', 'absent': '欠席', 'late': '遅刻' };
 
+    let currentSemester = '1年前期';
     let currentSlotId = null;
     let timetableData = {};
     let db = null;
@@ -514,7 +539,7 @@
 
     function initDB() {
       return new Promise((resolve) => {
-        const request = indexedDB.open('TimetableAppDB', 1);
+        const request = indexedDB.open('TimetableAppDB_v2', 1);
         request.onupgradeneeded = (e) => {
           const database = e.target.result;
           if (!database.objectStoreNames.contains('lessons')) {
@@ -549,6 +574,11 @@
       });
     }
 
+    function changeSemester() {
+      currentSemester = document.getElementById('semesterSelect').value;
+      renderTimetable();
+    }
+
     function saveLessonToDB(lesson) {
       if (!db) return;
       const tx = db.transaction('lessons', 'readwrite');
@@ -559,6 +589,10 @@
       if (!db) return;
       const tx = db.transaction('lessons', 'readwrite');
       tx.objectStore('lessons').delete(id);
+    }
+
+    function getFullKey(slotId) {
+      return `${currentSemester}_${slotId}`;
     }
 
     function renderTimetable() {
@@ -584,7 +618,8 @@
 
         days.forEach(day => {
           const slotId = `${day}_${p.num}`;
-          const data = timetableData[slotId];
+          const fullKey = getFullKey(slotId);
+          const data = timetableData[fullKey];
           const slot = document.createElement('div');
 
           if (data && data.name) {
@@ -612,7 +647,7 @@
             slot.innerHTML = '<div class="plus-btn">＋</div>';
           }
 
-          slot.onclick = () => openModal(slotId, `${day}曜 ${p.num}限`);
+          slot.onclick = () => openModal(slotId, `${currentSemester} ${day}曜 ${p.num}限`);
           container.appendChild(slot);
         });
       });
@@ -620,9 +655,10 @@
 
     function openModal(slotId, titleText) {
       currentSlotId = slotId;
+      const fullKey = getFullKey(slotId);
       document.getElementById('modalSlotTitle').textContent = titleText;
       
-      const data = timetableData[slotId] || { name: '', classroom: '', syllabusUrl: '', attendance: Array(15).fill('none'), notes: '' };
+      const data = timetableData[fullKey] || { name: '', classroom: '', syllabusUrl: '', attendance: Array(15).fill('none'), notes: '' };
 
       isEditMode = !data.name;
       updateModalDisplayMode();
@@ -700,20 +736,23 @@
     }
 
     function saveAttendanceQuick() {
-      if (!currentSlotId || !timetableData[currentSlotId]) return;
+      if (!currentSlotId) return;
+      const fullKey = getFullKey(currentSlotId);
+      if (!timetableData[fullKey]) return;
 
       const attendance = [];
       document.querySelectorAll('#viewAttendanceGrid .attendance-box').forEach(box => {
         attendance.push(box.dataset.status);
       });
 
-      timetableData[currentSlotId].attendance = attendance;
-      saveLessonToDB(timetableData[currentSlotId]);
+      timetableData[fullKey].attendance = attendance;
+      saveLessonToDB(timetableData[fullKey]);
       renderTimetable();
     }
 
     function saveCurrentLesson() {
       if (!currentSlotId) return;
+      const fullKey = getFullKey(currentSlotId);
 
       const name = document.getElementById('subjectName').value.trim();
       const classroom = document.getElementById('classroom').value.trim();
@@ -721,16 +760,16 @@
       const notes = document.getElementById('notes').value;
 
       let attendance = Array(15).fill('none');
-      if (timetableData[currentSlotId] && timetableData[currentSlotId].attendance) {
-        attendance = timetableData[currentSlotId].attendance;
+      if (timetableData[fullKey] && timetableData[fullKey].attendance) {
+        attendance = timetableData[fullKey].attendance;
       }
 
       if (!name) {
-        deleteLessonFromDB(currentSlotId);
-        delete timetableData[currentSlotId];
+        deleteLessonFromDB(fullKey);
+        delete timetableData[fullKey];
       } else {
-        const lesson = { id: currentSlotId, name, classroom, syllabusUrl, attendance, notes };
-        timetableData[currentSlotId] = lesson;
+        const lesson = { id: fullKey, semester: currentSemester, slotId: currentSlotId, name, classroom, syllabusUrl, attendance, notes };
+        timetableData[fullKey] = lesson;
         saveLessonToDB(lesson);
       }
 
@@ -740,8 +779,9 @@
 
     function deleteLesson() {
       if (!currentSlotId) return;
-      deleteLessonFromDB(currentSlotId);
-      delete timetableData[currentSlotId];
+      const fullKey = getFullKey(currentSlotId);
+      deleteLessonFromDB(fullKey);
+      delete timetableData[fullKey];
       renderTimetable();
       closeModal();
     }
@@ -750,7 +790,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(timetableData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `timetable_backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `timetable_all_semesters_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -764,7 +804,7 @@
         try {
           const importedData = JSON.parse(e.target.result);
           if (typeof importedData === 'object' && importedData !== null) {
-            if (confirm('現在のデータを上書きして復元します。よろしいですか？')) {
+            if (confirm('全セメスターのデータを上書きして復元します。よろしいですか？')) {
               const tx = db.transaction('lessons', 'readwrite');
               const store = tx.objectStore('lessons');
               store.clear().onsuccess = () => {
@@ -773,7 +813,7 @@
                 });
                 timetableData = importedData;
                 renderTimetable();
-                alert('データを正常に復元いたしましたわ！');
+                alert('全セメスターのデータを正常に復元いたしましたわ！');
               };
             }
           }
@@ -788,7 +828,6 @@
       return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
 
-    // Service Worker 登録
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW Error:', err));
